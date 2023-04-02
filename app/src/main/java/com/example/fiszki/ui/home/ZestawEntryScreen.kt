@@ -85,7 +85,7 @@ fun ZestawEntryScreen(
                 onClick = navigateBack,
                 enabled = true
             ) {
-                Text("ANULUJ", color = Color.White, fontSize = 20.sp)
+                Text("ANULUJ", color = Color(0xFF483D8B), fontSize = 20.sp)
             }
         }
     }

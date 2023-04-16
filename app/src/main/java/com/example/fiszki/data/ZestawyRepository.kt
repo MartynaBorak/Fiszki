@@ -10,4 +10,6 @@ interface ZestawyRepository {
     suspend fun deleteZestaw(zestaw: Zestaw)
 
     fun getZestawStream(id: Int): Flow<Zestaw?>
+
+    fun getAllZestawyStream(): Flow<List<Zestaw>>
 }

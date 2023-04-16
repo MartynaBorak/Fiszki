@@ -16,4 +16,7 @@ interface ZestawDao {
 
     @Query("SELECT * from zestaw WHERE zestaw_id = :id")
     fun getZestaw(id: Int): Flow<Zestaw>
+
+    @Query("SELECT * from zestaw ORDER BY zestaw_id ASC")
+    fun getAllZestawy(): Flow<List<Zestaw>>
 }

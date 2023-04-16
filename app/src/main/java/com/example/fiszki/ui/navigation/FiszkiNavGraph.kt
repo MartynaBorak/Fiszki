@@ -1,7 +1,10 @@
 package com.example.fiszki.ui.navigation
 
-import android.util.Log
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
@@ -9,16 +12,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.fiszki.ui.home.*
-import com.example.fiszki.ui.zestaw.ZestawEditDestination
-import com.example.fiszki.ui.zestaw.ZestawEditScreen
-import com.example.fiszki.ui.zestaw.ZestawScreen
-import com.example.fiszki.ui.zestaw.ZestawScreenDestination
+import com.example.fiszki.ui.zestaw.*
 
 @Composable
 fun FiszkiNavHost(
     navController: NavHostController,
     modifier: Modifier = Modifier
 ){
+    var zestawId: Int by remember { mutableStateOf(0) }
     NavHost(
         navController = navController,
         startDestination = HomeDestination.route,
@@ -49,7 +50,10 @@ fun FiszkiNavHost(
             })
         ) {
             ZestawScreen(
-                navigateToFiszkaEntry = { /* TODO */ },
+                navigateToFiszkaEntry = { id ->
+                    navController.navigate(FiszkaEntryDestination.route)
+                        .also { zestawId = id }
+                },
                 navigateToFiszkaDetails = { /* TODO */ },
                 navigateToZestawEdit = {
                     navController.navigate("${ZestawEditDestination.route}/${it}")
@@ -65,10 +69,21 @@ fun FiszkiNavHost(
             })
         ) {
             ZestawEditScreen(
-                navigateBack = { navController.popBackStack() }
+                navigateBack = { navController.navigateUp() },
+                navigateHome = {
+                    navController.popBackStack(route = HomeDestination.route, inclusive = false)
+                }
             )
         }
-        //ZestawEditScreen, FiszkaEntryScreen, FiszkaDetailsScreen, FiszkaEditScreen
+
+        composable( route = FiszkaEntryDestination.route ) {
+            FiszkaEntryScreen(
+                navigateBack = { navController.navigateUp() },
+                zestawId = zestawId
+            )
+        }
+
+        //FiszkaDetailsScreen, FiszkaEditScreen
 
 
         //learn

@@ -11,9 +11,7 @@ class ZestawEntryViewModel(private val zestawyRepository: ZestawyRepository) : V
         private set
 
     fun updateUiState(newZestawUiState: ZestawUiState) {
-        if(newZestawUiState.isValid()) {
-            zestawUiState = newZestawUiState.copy()
-        }
+        zestawUiState = newZestawUiState.copy()
     }
 
     suspend fun saveZestaw() {

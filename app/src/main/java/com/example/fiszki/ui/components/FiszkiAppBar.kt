@@ -10,6 +10,7 @@ import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
+import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Lock
 
 @Composable
@@ -89,7 +90,7 @@ fun ActionButton(
                         )
         }
         else -> IconButton(onClick = {}) { //tymczasowo, bo tego wcale ma nie byc
-                    Icon(imageVector = Icons.Outlined.Lock, contentDescription = null)
+                    Icon(imageVector = Icons.Outlined.Favorite, contentDescription = null)
         }
     }
 

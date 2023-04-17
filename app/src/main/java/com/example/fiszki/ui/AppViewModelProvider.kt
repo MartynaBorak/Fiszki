@@ -8,9 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.fiszki.FiszkiApplication
 import com.example.fiszki.ui.home.ZestawEntryViewModel
 import com.example.fiszki.ui.home.ZestawyViewModel
-import com.example.fiszki.ui.zestaw.FiszkaEntryViewModel
-import com.example.fiszki.ui.zestaw.ZestawEditViewModel
-import com.example.fiszki.ui.zestaw.ZestawViewModel
+import com.example.fiszki.ui.zestaw.*
 
 object AppViewModelProvider {
     val Factory = viewModelFactory {
@@ -48,6 +46,22 @@ object AppViewModelProvider {
         // Initializer for FiszkaEntryVM
         initializer {
             FiszkaEntryViewModel(
+                FiszkiApplication().container.fiszkiRepository
+            )
+        }
+
+        // Initializer for FiszkaDetailsVM
+        initializer {
+            FiszkaDetailsViewModel(
+                this.createSavedStateHandle(),
+                FiszkiApplication().container.fiszkiRepository
+            )
+        }
+
+        // Initializer for FiszkaEditVM
+        initializer {
+            FiszkaEditViewModel(
+                this.createSavedStateHandle(),
                 FiszkiApplication().container.fiszkiRepository
             )
         }

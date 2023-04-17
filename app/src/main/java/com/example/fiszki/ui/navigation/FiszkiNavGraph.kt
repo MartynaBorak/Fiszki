@@ -54,7 +54,9 @@ fun FiszkiNavHost(
                     navController.navigate(FiszkaEntryDestination.route)
                         .also { zestawId = id }
                 },
-                navigateToFiszkaDetails = { /* TODO */ },
+                navigateToFiszkaDetails = {
+                    navController.navigate("${FiszkaDetailsDestination.route}/${it}")
+                },
                 navigateToZestawEdit = {
                     navController.navigate("${ZestawEditDestination.route}/${it}")
                 },
@@ -64,7 +66,7 @@ fun FiszkiNavHost(
 
         composable(
             route = ZestawEditDestination.routeWithArgs,
-            arguments = listOf(navArgument(ZestawScreenDestination.zestawIdArg) {
+            arguments = listOf(navArgument(ZestawEditDestination.zestawIdArg) {
                 type = NavType.IntType
             })
         ) {
@@ -83,7 +85,28 @@ fun FiszkiNavHost(
             )
         }
 
-        //FiszkaDetailsScreen, FiszkaEditScreen
+        composable(
+            route = FiszkaDetailsDestination.routeWithArgs,
+            arguments = listOf(navArgument(FiszkaDetailsDestination.fiszkaIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            FiszkaDetailsScreen(
+                navigateToFiszkaEdit = {
+                    navController.navigate("${FiszkaEditDestination.route}/${it}")
+                },
+                navigateBack = { navController.navigateUp() }
+            )
+        }
+
+        composable(
+            route = FiszkaEditDestination.routeWithArgs,
+            arguments = listOf(navArgument(FiszkaEditDestination.fiszkaIdArg) {
+                type = NavType.IntType
+            })
+        ) {
+            FiszkaEditScreen(navigateBack = { navController.navigateUp() })
+        }
 
 
         //learn

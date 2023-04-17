@@ -27,6 +27,7 @@ import com.example.fiszki.ui.navigation.NavDestination
 import com.example.fiszki.ui.theme.FiszkiTheme
 import java.time.LocalDateTime
 import java.time.LocalTime
+import java.time.format.DateTimeParseException
 import java.util.*
 
 
@@ -41,11 +42,13 @@ object SettingsDestination: NavDestination {
 fun SettingsScreen(
 
 
+
     navigateUp: () -> Unit,
     //viewModel: SettingsViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
+
+     val context = LocalContext.current
 
     //timePicker
 
@@ -61,7 +64,7 @@ fun SettingsScreen(
     val mTimePickerDialog = TimePickerDialog(
         context,
         {_, mHour : Int, mMinute: Int ->
-            mTime.value = "$mHour:$mMinute"
+            mTime.value = String.format("%02d:%02d", mHour, mMinute)
         }, mHour, mMinute, false
     )
 
@@ -91,6 +94,7 @@ fun SettingsScreen(
         ) {
             Spacer(modifier = Modifier.size(104.dp))
 
+
             Text("PRZYPOMNIENIA", fontSize = 28.sp)
 
             val checkedState = remember {
@@ -102,6 +106,8 @@ fun SettingsScreen(
                 onCheckedChange = { checkedState.value = it },
                 colors = SwitchDefaults.colors(Color.Green)
             )
+
+
 
             if (checkedState.value) {
 
@@ -127,6 +133,9 @@ fun SettingsScreen(
                 ) {
                     Button(
                         onClick = {
+                            if (mTime.value.isBlank()) {
+                                Toast.makeText(context, "Nie wybrano godziny", Toast.LENGTH_SHORT).show()
+                            } else {
                             val currentTime = LocalTime.now()
                             val alarmTime = LocalTime.parse(mTime.value)
                             val triggerTime = if (alarmTime.isBefore(currentTime)) {
@@ -145,7 +154,7 @@ fun SettingsScreen(
                             alarmItem?.let(scheduler::schedule)
 
                             Toast.makeText(context, "Ustawienia zapisane", Toast.LENGTH_SHORT).show()
-                        },
+                        }},
                         colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B))
                     ) {
                         Text(text = "ZAPISZ", color = Color.White, fontSize = 20.sp)

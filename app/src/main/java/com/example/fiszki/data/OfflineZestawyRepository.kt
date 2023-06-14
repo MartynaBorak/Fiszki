@@ -10,4 +10,6 @@ class OfflineZestawyRepository(private val zestawDao: ZestawDao) : ZestawyReposi
     override suspend fun deleteZestaw(zestaw: Zestaw) = zestawDao.delete(zestaw)
 
     override fun getZestawStream(id: Int): Flow<Zestaw?> = zestawDao.getZestaw(id)
+
+    override fun getAllZestawyStream(): Flow<List<Zestaw>> = zestawDao.getAllZestawy()
 }

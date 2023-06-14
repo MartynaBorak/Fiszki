@@ -2,25 +2,19 @@ package com.example.fiszki.ui.home
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.background
-import androidx.compose.foundation.text.BasicText
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.navigation.NavDestination
 import com.example.fiszki.ui.theme.FiszkiTheme
+import kotlinx.coroutines.launch
 
 
 object ZestawEntryDestination: NavDestination {
@@ -30,11 +24,12 @@ object ZestawEntryDestination: NavDestination {
 @Composable
 fun ZestawEntryScreen(
     navigateBack: () -> Unit,
-    //viewModel: ZestawEntryViewModel = viewModel(factory = AppViewModelProvider.Factory),
+    viewModel: ZestawEntryViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 ){
-    //val zestawUiState by viewModel.zestawUiState.collectAsState()
-    //val coroutineScope = rememberCoroutineScope()
+    val zestawUiState = viewModel.zestawUiState
+    val coroutineScope = rememberCoroutineScope()
+
     Surface(
         modifier = Modifier
             .fillMaxSize()
@@ -52,29 +47,23 @@ fun ZestawEntryScreen(
 
             Spacer(modifier = Modifier.size(30.dp))
 
-            var value by remember { mutableStateOf(TextFieldValue("")) }
-
-            BasicTextField(
-                value = value,
-                onValueChange = {value = it},
-                decorationBox = {innerTextField -> Row(
-                    Modifier.background(Color.LightGray,
-                    RoundedCornerShape(percent = 10))
-                    .padding(16.dp)
-                        .fillMaxWidth())
-                {
-                    if (value.text.isEmpty()){
-                        Text("Wprowadź nazwę zestawu...")
-                    }
-                    innerTextField()
-                }
-                }
+            OutlinedTextField(
+                value = zestawUiState.name,
+                onValueChange = { viewModel.updateUiState(zestawUiState.copy(name=it)) },
+                label = { Text("Nazwa zestawu") },
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
             )
 
             Spacer(modifier = Modifier.size(150.dp))
 
             Button(
-                onClick = { },
+                onClick = {
+                    coroutineScope.launch {
+                        viewModel.saveZestaw()
+                        navigateBack()
+                    }
+                },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
                 enabled = true
             ) {

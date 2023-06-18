@@ -12,4 +12,6 @@ interface ZestawyRepository {
     fun getZestawStream(id: Int): Flow<Zestaw?>
 
     fun getAllZestawyStream(): Flow<List<Zestaw>>
+
+    fun getZestawyCountsStream(): Flow<Map<Int, Int>>
 }

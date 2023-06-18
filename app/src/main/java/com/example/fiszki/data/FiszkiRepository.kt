@@ -13,5 +13,5 @@ interface FiszkiRepository {
 
     fun getAllInZestawStream(id: Int): Flow<List<Fiszka>>
 
-    fun getNumberInZestawStream(id: Int): Int
+    fun getAllFavInZestawStream(id: Int): Flow<List<Fiszka>>
 }

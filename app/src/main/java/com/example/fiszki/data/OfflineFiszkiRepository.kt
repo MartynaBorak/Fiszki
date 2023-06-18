@@ -13,5 +13,5 @@ class OfflineFiszkiRepository(private val fiszkaDao: FiszkaDao) : FiszkiReposito
 
     override fun getAllInZestawStream(id: Int): Flow<List<Fiszka>> = fiszkaDao.getAllInZestaw(id)
 
-    override fun getNumberInZestawStream(id: Int): Int = fiszkaDao.getNumberInZestaw(id)
+    override fun getAllFavInZestawStream(id: Int): Flow<List<Fiszka>> = fiszkaDao.getAllFavInZestaw(id)
 }

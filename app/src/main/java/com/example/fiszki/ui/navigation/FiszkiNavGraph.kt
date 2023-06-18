@@ -12,6 +12,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import com.example.fiszki.ui.home.*
+import com.example.fiszki.ui.learn.LearnScreen
+import com.example.fiszki.ui.learn.LearnScreenDestination
 import com.example.fiszki.ui.zestaw.*
 
 @Composable
@@ -59,6 +61,9 @@ fun FiszkiNavHost(
                 },
                 navigateToZestawEdit = {
                     navController.navigate("${ZestawEditDestination.route}/${it}")
+                },
+                navigateToLearn = { i, j ->
+                    navController.navigate("${LearnScreenDestination.route}/${i}/${j}")
                 },
                 navigateBack = { navController.popBackStack() }
             )
@@ -108,8 +113,18 @@ fun FiszkiNavHost(
             FiszkaEditScreen(navigateBack = { navController.navigateUp() })
         }
 
-
         //learn
-        //memory
+        composable(
+            route = LearnScreenDestination.routeWithArgs,
+            arguments = listOf(
+                navArgument(LearnScreenDestination.zestawIdArg){type = NavType.IntType},
+                navArgument(LearnScreenDestination.filteredArg){type = NavType.BoolType}
+            )
+        ){
+            LearnScreen(
+                navigateToSummary = { /*TODO*/ },
+                navigateBack = { navController.navigateUp() }
+            )
+        }
     }
 }

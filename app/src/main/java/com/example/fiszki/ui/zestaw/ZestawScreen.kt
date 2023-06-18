@@ -40,7 +40,7 @@ import java.io.File
 
 object ZestawScreenDestination: NavDestination {
     override val route = "zestaw"
-    const val zestawIdArg = "zastawId"
+    const val zestawIdArg = "zestawId"
     val routeWithArgs = "$route/{$zestawIdArg}"
 }
 
@@ -49,6 +49,7 @@ fun ZestawScreen(
     navigateToFiszkaEntry: (Int) -> Unit,
     navigateToFiszkaDetails: (Int) -> Unit,
     navigateToZestawEdit: (Int) -> Unit,
+    navigateToLearn: (Int, Boolean) -> Unit,
     navigateBack: () -> Unit,
     viewModel: ZestawViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
@@ -103,7 +104,7 @@ fun ZestawScreen(
                     )
                 }
                 Button(
-                    onClick = {},
+                    onClick = { navigateToLearn(zestawUiState.id, filtered) }, //TODO: tu bedzie pytanie czy filtrowane czy nie
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true
                 ) {

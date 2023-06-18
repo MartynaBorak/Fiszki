@@ -5,6 +5,7 @@ import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.preference.PreferenceManager
 import com.example.fiszki.notifications.AlarmItem
 import com.example.fiszki.notifications.AndroidAlarmScheduler
 import com.example.fiszki.ui.components.FiszkiAppBar
@@ -30,52 +32,44 @@ import java.time.LocalTime
 import java.time.format.DateTimeParseException
 import java.util.*
 
-
-
 object SettingsDestination: NavDestination {
     override val route = "settings"
 }
 
-
-
 @Composable
 fun SettingsScreen(
-
-
-
     navigateUp: () -> Unit,
-    //viewModel: SettingsViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
 
-     val context = LocalContext.current
-
-    //timePicker
-
-    // deklaracja i inicjalizacja kalendarza
+    // Deklaracja i inicjalizacja kalendarza
     val mCalendar = Calendar.getInstance()
     val mHour = mCalendar[Calendar.HOUR_OF_DAY]
     val mMinute = mCalendar[Calendar.MINUTE]
 
-    // val do przechowywania czasu
+    // Val do przechowywania czasu
     val mTime = remember { mutableStateOf("") }
 
-    // utworzenie dialogu time pickera
+    // Utworzenie dialogu TimePicker
     val mTimePickerDialog = TimePickerDialog(
         context,
-        {_, mHour : Int, mMinute: Int ->
+        { _, mHour: Int, mMinute: Int ->
             mTime.value = String.format("%02d:%02d", mHour, mMinute)
         }, mHour, mMinute, false
     )
 
-    //
-
-    //var timeText by remember { mutableStateOf("") }
     val scheduler = AndroidAlarmScheduler(context)
     var alarmItem: AlarmItem? = null
 
-    //
-    //val settingsUiState by viewModel.settingsUiState.collectAsState()
+    if (sharedPreferences.contains("reminder_time")) {
+        val savedTime = sharedPreferences.getString("reminder_time", "")
+        if (savedTime != null && savedTime.isNotEmpty()) {
+            mTime.value = savedTime
+        }
+    }
+
     Scaffold(
         topBar = {
             FiszkiAppBar(
@@ -84,8 +78,6 @@ fun SettingsScreen(
                 navigateUp = navigateUp
             )
         }
-
-
     ) { paddingValues ->
         Column(
             modifier = Modifier.fillMaxSize().padding(paddingValues),
@@ -93,96 +85,75 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.size(104.dp))
-
-
             Text("PRZYPOMNIENIA", fontSize = 28.sp)
-
-            val checkedState = remember {
-                mutableStateOf(false)
+            Spacer(modifier = Modifier.size(48.dp))
+            // Po naciśnięciu guzika wyświetla się TimePicker
+            Button(
+                onClick = { mTimePickerDialog.show() },
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFF8FBC8F))
+            ) {
+                Text(text = "GODZINA PRZYPOMNIEŃ", color = Color.Black, fontSize = 20.sp)
             }
-
-            Switch(
-                checked = checkedState.value,
-                onCheckedChange = { checkedState.value = it },
-                colors = SwitchDefaults.colors(Color.Green)
-            )
-
-
-
-            if (checkedState.value) {
-
-                Spacer(modifier = Modifier.size(48.dp))
-
-                // Po naciśnięciu guzika wyświetla się time picker
+            // Wyświetlanie czasu wybranego przez użytkownika
+            Text(text = "Wybrany czas: ${mTime.value}", fontSize = 20.sp)
+            Spacer(modifier = Modifier.size(48.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
                 Button(
-                    onClick = { mTimePickerDialog.show() },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFFADD8E6))
-                ) {
-                    Text(text = "GODZINA PRZYPOMNIEŃ", color = Color.Black, fontSize = 20.sp)
-                }
-
-
-                // Wyświetlanie czasu wybranego przez użytkownika
-                Text(text = "Wybrany czas: ${mTime.value}", fontSize = 20.sp)
-
-                Spacer(modifier = Modifier.size(48.dp))
-
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Button(
-                        onClick = {
-                            if (mTime.value.isBlank()) {
-                                Toast.makeText(context, "Nie wybrano godziny", Toast.LENGTH_SHORT).show()
-                            } else {
+                    onClick = {
+                        if (mTime.value.isBlank()) {
+                            Toast.makeText(context, "Nie wybrano godziny", Toast.LENGTH_SHORT).show()
+                        } else {
                             val currentTime = LocalTime.now()
-                            val alarmTime = LocalTime.parse(mTime.value)
-                            val triggerTime = if (alarmTime.isBefore(currentTime)) {
-                                alarmTime.plusHours(24)
-                            } else {
-                                alarmTime
+                            val alarmTime = try {
+                                LocalTime.parse(mTime.value)
+                            } catch (ex: DateTimeParseException) {
+                                null
                             }
-                            val triggerDateTime = LocalDateTime.of(
-                                LocalDateTime.now().toLocalDate(),
-                                triggerTime
-                            )
-                            alarmItem = AlarmItem(
-                                time = triggerDateTime,
-                                message = ""
-                            )
-                            alarmItem?.let(scheduler::schedule)
-
-                            Toast.makeText(context, "Ustawienia zapisane", Toast.LENGTH_SHORT).show()
-                        }},
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B))
-                    ) {
-                        Text(text = "ZAPISZ", color = Color.White, fontSize = 20.sp)
-                    }
-
-                    Spacer(modifier = Modifier.size(16.dp))
-
-                    Button(
-                        onClick = {
-                            alarmItem?.let(scheduler::cancel)
-                            Toast.makeText(context, "Przypomnienie anulowane", Toast.LENGTH_SHORT).show()
-                            mTime.value=""
-                        },
-                        colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B))
-                    ) {
-                        Text(text = "ANULUJ", color = Color.White, fontSize = 20.sp)
-                    }
+                            if (alarmTime != null) {
+                                val triggerTime = if (alarmTime.isBefore(currentTime)) {
+                                    alarmTime.plusHours(24)
+                                } else {
+                                    alarmTime
+                                }
+                                val triggerDateTime = LocalDateTime.of(
+                                    LocalDateTime.now().toLocalDate(),
+                                    triggerTime
+                                )
+                                alarmItem = AlarmItem(
+                                    time = triggerDateTime,
+                                    message = ""
+                                )
+                                alarmItem?.let(scheduler::schedule)
+                                sharedPreferences.edit().putString("reminder_time", mTime.value).apply()
+                                Toast.makeText(context, "Ustawienia zapisane", Toast.LENGTH_SHORT).show()
+                            } else {
+                                Toast.makeText(context, "Nieprawidłowy format godziny", Toast.LENGTH_SHORT).show()
+                            }
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57))
+                ) {
+                    Text(text = "ZAPISZ", color = Color.White, fontSize = 20.sp)
                 }
-            }else{
-                alarmItem?.let(scheduler::cancel)
-                mTime.value=""
+                Spacer(modifier = Modifier.size(16.dp))
+                Button(
+                    onClick = {
+                        alarmItem?.let(scheduler::cancel)
+                        Toast.makeText(context, "Przypomnienie anulowane", Toast.LENGTH_SHORT).show()
+                        mTime.value = ""
+                        sharedPreferences.edit().remove("reminder_time").apply()
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFF6347))
+                ) {
+                    Text(text = "ANULUJ", color = Color.White, fontSize = 20.sp)
+                }
             }
-
-
         }
     }
 }
-
 
 @Preview
 @Composable

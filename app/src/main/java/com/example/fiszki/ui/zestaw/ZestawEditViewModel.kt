@@ -1,5 +1,6 @@
 package com.example.fiszki.ui.zestaw
 
+import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -31,6 +32,12 @@ class ZestawEditViewModel(
         }
     }
 
+    var fiszkiUiState = mutableStateOf(FiszkiUiState())
+
+    fun updateFiszkiUiState(updatedUiState: FiszkiUiState) {
+        fiszkiUiState.value = updatedUiState
+    }
+
     fun updateUiState(newZestawUiState: ZestawUiState) {
         zestawUiState = newZestawUiState.copy()
     }
@@ -44,4 +51,6 @@ class ZestawEditViewModel(
     suspend fun deleteZestaw() {
         zestawyRepository.deleteZestaw(zestawUiState.toZestaw())
     }
+
 }
+

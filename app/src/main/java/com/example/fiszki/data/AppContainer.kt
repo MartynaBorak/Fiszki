@@ -15,4 +15,5 @@ class AppDataContainer(private val context: Context) : AppContainer {
     override val zestawyRepository: ZestawyRepository by lazy {
         OfflineZestawyRepository(FiszkiDatabase.getDatabase(context).zestawDao())
     }
+
 }

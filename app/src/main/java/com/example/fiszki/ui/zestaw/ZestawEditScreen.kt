@@ -1,6 +1,8 @@
 package com.example.fiszki.ui.zestaw
 
+import android.os.Environment
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -8,12 +10,18 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.fiszki.data.Fiszka
 import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Paragraph
 import kotlinx.coroutines.launch
 
 object ZestawEditDestination: NavDestination {
@@ -30,7 +38,9 @@ fun ZestawEditScreen(
     modifier: Modifier = Modifier
 ){
     val zestawUiState = viewModel.zestawUiState
+    val fiszkiUiState = viewModel.fiszkiUiState.value
     val coroutineScope = rememberCoroutineScope()
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -70,7 +80,7 @@ fun ZestawEditScreen(
                             navigateBack()
                         }
                     },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57)),
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -82,7 +92,7 @@ fun ZestawEditScreen(
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("ANULUJ", color = Color(0xFF483D8B), fontSize = 20.sp)
+                    Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
                 }
             }
 
@@ -94,14 +104,19 @@ fun ZestawEditScreen(
                     .fillMaxWidth()
                     .padding(8.dp)
             ) {
-                Button(
-                    onClick = { /* TODO: implementacja eksportu */ },
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                /*Button(
+                    onClick = {
+                       if (fiszkiUiState.fiszkiList.isEmpty())
+                       {
+                           Toast.makeText(context, "Brak fiszek", Toast.LENGTH_SHORT).show()}
+                       else
+                       { exportToPdf(fiszkiUiState.fiszkiList) }},
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text("EKSPORTUJ DO PDF", color = Color.White, fontSize = 20.sp)
-                }
+                }*/
 
                 var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
                 OutlinedButton(
@@ -109,7 +124,7 @@ fun ZestawEditScreen(
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("USUŃ ZESTAW", color = Color(0xFF483D8B), fontSize = 20.sp)
+                    Text("USUŃ ZESTAW", color = Color(0xFFFF6347), fontSize = 20.sp)
                 }
 
                 if(deleteConfirmationRequired) {

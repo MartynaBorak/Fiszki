@@ -93,7 +93,7 @@ fun FiszkaEditScreen(
                         navigateBack()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57)),
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -105,7 +105,7 @@ fun FiszkaEditScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("ANULUJ", color = Color(0xFF483D8B), fontSize = 20.sp)
+                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
             }
         }
     }

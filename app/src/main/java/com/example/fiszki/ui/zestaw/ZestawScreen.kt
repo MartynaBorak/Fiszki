@@ -1,5 +1,9 @@
 package com.example.fiszki.ui.zestaw
 
+import android.content.Context
+import android.content.Intent
+import android.os.Environment
+import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,6 +17,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.outlined.Favorite
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
@@ -21,12 +26,24 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.fiszki.data.Fiszka
 import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
+import com.itextpdf.kernel.pdf.PdfDocument
+import com.itextpdf.kernel.pdf.PdfWriter
+import com.itextpdf.layout.Document
+import com.itextpdf.layout.element.Paragraph
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
+import java.io.File
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import android.net.Uri
+
 
 object ZestawScreenDestination: NavDestination {
     override val route = "zestaw"
@@ -42,8 +59,8 @@ fun ZestawScreen(
     navigateBack: () -> Unit,
     viewModel: ZestawViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
-){
-    // TODO: poprawić, żeby odświeżała się nazwa zestawu po edytowaniu
+) {
+    val context = LocalContext.current
     val zestawUiState = viewModel.zestawUiState
     val filtered = viewModel.filterFav
     val fiszkiUiState by viewModel.fiszkiUiState.collectAsState()
@@ -94,17 +111,23 @@ fun ZestawScreen(
                 }
                 Button(
                     onClick = {},
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true
                 ) {
                     Text("UCZ SIĘ", color = Color.White, fontSize = 20.sp)
                 }
                 Button(
-                    onClick = {},
-                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                    onClick = {
+                        if (fiszkiUiState.fiszkiList.isEmpty()) {
+                            Toast.makeText(context, "Brak fiszek", Toast.LENGTH_SHORT).show()
+                        } else {
+                            exportToPdf(context, fiszkiUiState.fiszkiList, coroutineScope, zestawUiState.name)
+                        }
+                    },
+                    colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA07A)),
                     enabled = true
                 ) {
-                    Text("GRAJ", color = Color.White, fontSize = 20.sp)
+                    Text("PDF", color = Color.White, fontSize = 20.sp)
                 }
             }
             Divider()
@@ -209,10 +232,80 @@ fun FiszkaItem(
             )
             IconButton(onClick = { onFavChanged(fiszka) }) {
                 Icon(
-                    imageVector = if(fiszka.isFavourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                    imageVector = if (fiszka.isFavourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = "Dodaj lub usuń z ulubionych"
                 )
             }
         }
     }
 }
+
+
+
+fun exportToPdf(
+    context: Context,
+    fiszki: List<Fiszka>,
+    viewModelScope: CoroutineScope,
+    zestawName: String
+) {
+    viewModelScope.launch(Dispatchers.IO) {
+        withContext(Dispatchers.Main) {
+            try {
+                val file = File(context.filesDir, "fiszki.pdf")
+
+                // Inicjalizacja dokumentu PDF
+                val pdfWriter = PdfWriter(file)
+                val pdfDocument = PdfDocument(pdfWriter)
+                val document = Document(pdfDocument)
+
+                // Dodawanie nazwy zestawu do dokumentu
+                val content1 = "Zestaw: $zestawName"
+                val zestawNameParagraph = Paragraph(content1)
+                document.add(zestawNameParagraph)
+
+                // Dodawanie fiszek do dokumentu
+                for (fiszka in fiszki) {
+                    val content = "${fiszka.front} - ${fiszka.back}"
+                    val paragraph = Paragraph(content)
+                    document.add(paragraph)
+                }
+
+                // Zakończenie dokumentu
+                document.close()
+
+                // Otwieranie pliku PDF
+                val uri = FileProvider.getUriForFile(context, "com.example.fiszki.fileprovider", file)
+                val intent = Intent(Intent.ACTION_VIEW)
+                intent.setDataAndType(uri, "application/pdf")
+                intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(intent)
+
+            } catch (e: Exception) {
+                // Obsługa błędu podczas eksportu
+                Toast.makeText(context, "Błąd podczas eksportu do PDF", Toast.LENGTH_SHORT).show()
+                e.printStackTrace()
+            }
+        }
+    }
+}
+
+
+
+
+
+fun sharePdfFile(context: Context) {
+    val file = File(context.filesDir, "fiszki.pdf")
+    val uri = FileProvider.getUriForFile(context, "com.example.fiszki.fileprovider", file)
+
+    val intent = Intent(Intent.ACTION_SEND)
+    intent.type = "application/pdf"
+    intent.putExtra(Intent.EXTRA_STREAM, uri)
+    intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+
+    val chooserIntent = Intent.createChooser(intent, "Udostępnij plik PDF")
+    chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    context.startActivity(chooserIntent)
+}
+
+

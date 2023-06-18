@@ -64,7 +64,7 @@ fun ZestawEntryScreen(
                         navigateBack()
                     }
                 },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57)),
                 enabled = true
             ) {
                 Text("ZAPISZ", color = Color.White, fontSize = 20.sp)
@@ -74,7 +74,7 @@ fun ZestawEntryScreen(
                 onClick = navigateBack,
                 enabled = true
             ) {
-                Text("ANULUJ", color = Color(0xFF483D8B), fontSize = 20.sp)
+                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
             }
         }
     }

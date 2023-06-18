@@ -11,7 +11,6 @@ import com.example.fiszki.data.ZestawyRepository
 import com.example.fiszki.ui.home.ZestawUiState
 import com.example.fiszki.ui.home.toZestawUiState
 import com.example.fiszki.ui.zestaw.FiszkiUiState
-import com.example.fiszki.ui.zestaw.ZestawViewModel
 import com.example.fiszki.ui.zestaw.toFiszkaUiState
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -45,7 +44,7 @@ class LearnViewModel(
                 .map { FiszkiUiState(it.map { fiszka -> fiszka.toFiszkaUiState() }) }
                 .stateIn(
                     scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(LearnViewModel.TIMEOUT_MILLIS),
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                     initialValue = FiszkiUiState()
                 )
         } else {
@@ -53,11 +52,10 @@ class LearnViewModel(
                 .map { FiszkiUiState(it.map { fiszka -> fiszka.toFiszkaUiState()  }) }
                 .stateIn(
                     scope = viewModelScope,
-                    started = SharingStarted.WhileSubscribed(LearnViewModel.TIMEOUT_MILLIS),
+                    started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
                     initialValue = FiszkiUiState()
                 )
         }
 
-    var count = fiszkiUiState.value.fiszkiList.count()
     var seen by mutableStateOf(0)
 }

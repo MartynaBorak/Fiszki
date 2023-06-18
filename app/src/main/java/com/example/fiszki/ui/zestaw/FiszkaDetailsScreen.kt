@@ -88,7 +88,7 @@ fun FiszkaDetailsScreen(
 
             Button(
                 onClick = { navigateToFiszkaEdit(fiszkaUiState.id) },
-                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
+                colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
@@ -101,7 +101,15 @@ fun FiszkaDetailsScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("USUŃ", color = Color(0xFF483D8B), fontSize = 20.sp)
+                Text("USUŃ", color = Color(0xFFFF6347), fontSize = 20.sp)
+            }
+
+            OutlinedButton(
+                onClick = { navigateBack() },
+                enabled = true,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text("WRÓĆ", color = Color(0xFF6495ed), fontSize = 20.sp)
             }
 
             if(deleteConfirmationRequired) {

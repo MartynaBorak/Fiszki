@@ -45,7 +45,9 @@ fun ZestawScreen(
 ){
     // TODO: poprawić, żeby odświeżała się nazwa zestawu po edytowaniu
     val zestawUiState = viewModel.zestawUiState
+    val filtered = viewModel.filterFav
     val fiszkiUiState by viewModel.fiszkiUiState.collectAsState()
+    val favFiszkiUiState by viewModel.favFiszkiUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -84,11 +86,12 @@ fun ZestawScreen(
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
-                // TODO: coś do sortowania - ulubione na górze
-                Checkbox(
-                    checked = false,
-                    onCheckedChange = { /* TODO: zaimplementować alternatywne sortowanie */ }
-                )
+                IconButton(onClick = { viewModel.filterFav = !filtered }) {
+                    Icon(
+                        imageVector = if(filtered) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = "Filtruj ulubione/wszystkie"
+                    )
+                }
                 Button(
                     onClick = {},
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF483D8B)),
@@ -106,28 +109,56 @@ fun ZestawScreen(
             }
             Divider()
 
-            if(fiszkiUiState.fiszkiList.isEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    Text("Brak fiszek do pokazania")
+            if(filtered){
+                if(favFiszkiUiState.fiszkiList.isEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    ) {
+                        Text("Brak fiszek do pokazania")
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(paddingValues)
+                    ) {
+                        items(
+                            items = favFiszkiUiState.fiszkiList,
+                            key = { it.id }
+                        ) {
+                            FiszkaItem(fiszka = it, onFiszkaClick = { navigateToFiszkaDetails(it.id) })
+                        }
+                    }
                 }
             } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(paddingValues)
-                ) {
-                    items(
-                        items = fiszkiUiState.fiszkiList,
-                        key = { it.fiszka_id }
+                if(fiszkiUiState.fiszkiList.isEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                     ) {
-                        FiszkaItem(fiszka = it, onFiszkaClick = { navigateToFiszkaDetails(it.fiszka_id) })
+                        Text("Brak fiszek do pokazania")
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(paddingValues)
+                    ) {
+                        items(
+                            items = fiszkiUiState.fiszkiList,
+                            key = { it.id }
+                        ) {
+                            FiszkaItem(fiszka = it, onFiszkaClick = { navigateToFiszkaDetails(it.id) })
+                        }
                     }
                 }
             }
@@ -137,8 +168,8 @@ fun ZestawScreen(
 
 @Composable
 fun FiszkaItem(
-    fiszka: Fiszka,
-    onFiszkaClick: (Fiszka) -> Unit,
+    fiszka: FiszkaUiState,
+    onFiszkaClick: (FiszkaUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(

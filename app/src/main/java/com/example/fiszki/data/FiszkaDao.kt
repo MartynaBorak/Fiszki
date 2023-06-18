@@ -20,6 +20,6 @@ interface FiszkaDao {
     @Query("SELECT * from fiszka WHERE zestaw_id = :id ORDER BY front ASC")
     fun getAllInZestaw(id: Int): Flow<List<Fiszka>>
 
-    @Query("SELECT COUNT(*) from fiszka WHERE zestaw_id = :id")
-    fun getNumberInZestaw(id: Int): Int
+    @Query("SELECT * from fiszka WHERE zestaw_id = :id AND isFavourite ORDER BY front ASC")
+    fun getAllFavInZestaw(id: Int): Flow<List<Fiszka>>
 }

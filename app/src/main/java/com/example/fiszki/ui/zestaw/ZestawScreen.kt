@@ -2,7 +2,6 @@ package com.example.fiszki.ui.zestaw
 
 import android.content.Context
 import android.content.Intent
-import android.os.Environment
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -13,22 +12,18 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Favorite
-import androidx.compose.material.icons.outlined.Star
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.fiszki.data.Fiszka
 import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
@@ -37,12 +32,10 @@ import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
 import com.itextpdf.layout.element.Paragraph
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
-import java.io.File
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import android.net.Uri
+import java.io.File
 
 
 object ZestawScreenDestination: NavDestination {
@@ -62,7 +55,9 @@ fun ZestawScreen(
 ) {
     val context = LocalContext.current
     val zestawUiState = viewModel.zestawUiState
+    val filtered = viewModel.filterFav
     val fiszkiUiState by viewModel.fiszkiUiState.collectAsState()
+    val favFiszkiUiState by viewModel.favFiszkiUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
 
     Scaffold(
@@ -101,10 +96,12 @@ fun ZestawScreen(
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
-                Checkbox(
-                    checked = false,
-                    onCheckedChange = { /* TODO: zaimplementować alternatywne sortowanie */ }
-                )
+                IconButton(onClick = { viewModel.filterFav = !filtered }) {
+                    Icon(
+                        imageVector = if(filtered) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
+                        contentDescription = "Filtruj ulubione/wszystkie"
+                    )
+                }
                 Button(
                     onClick = {},
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
@@ -128,28 +125,72 @@ fun ZestawScreen(
             }
             Divider()
 
-            if(fiszkiUiState.fiszkiList.isEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(paddingValues)
-                ) {
-                    Text("Brak fiszek do pokazania")
+            if(filtered){
+                if(favFiszkiUiState.fiszkiList.isEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
+                    ) {
+                        Text("Brak fiszek do pokazania")
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(paddingValues)
+                    ) {
+                        items(
+                            items = favFiszkiUiState.fiszkiList,
+                            key = { it.id }
+                        ) {
+                            FiszkaItem(
+                                fiszka = it,
+                                onFiszkaClick = { navigateToFiszkaDetails(it.id) },
+                                onFavChanged = {
+                                    coroutineScope.launch {
+                                        viewModel.updateFiszka(it.copy(isFavourite = !it.isFavourite))
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             } else {
-                LazyColumn(
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(paddingValues)
-                ) {
-                    items(
-                        items = fiszkiUiState.fiszkiList,
-                        key = { it.fiszka_id }
+                if(fiszkiUiState.fiszkiList.isEmpty()) {
+                    Column(
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(paddingValues)
                     ) {
-                        FiszkaItem(fiszka = it, onFiszkaClick = { navigateToFiszkaDetails(it.fiszka_id) })
+                        Text("Brak fiszek do pokazania")
+                    }
+                } else {
+                    LazyColumn(
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(paddingValues)
+                    ) {
+                        items(
+                            items = fiszkiUiState.fiszkiList,
+                            key = { it.id }
+                        ) {
+                            FiszkaItem(
+                                fiszka = it,
+                                onFiszkaClick = { navigateToFiszkaDetails(it.id) },
+                                onFavChanged = {
+                                    coroutineScope.launch {
+                                        viewModel.updateFiszka(it.copy(isFavourite = !it.isFavourite))
+                                    }
+                                }
+                            )
+                        }
                     }
                 }
             }
@@ -159,8 +200,9 @@ fun ZestawScreen(
 
 @Composable
 fun FiszkaItem(
-    fiszka: Fiszka,
-    onFiszkaClick: (Fiszka) -> Unit,
+    fiszka: FiszkaUiState,
+    onFiszkaClick: (FiszkaUiState) -> Unit,
+    onFavChanged: (FiszkaUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -181,7 +223,7 @@ fun FiszkaItem(
                 text = fiszka.front,
                 fontSize = 18.sp
             )
-            IconButton(onClick = { /* TODO: update isFavourite fiszki */ }) {
+            IconButton(onClick = { onFavChanged(fiszka) }) {
                 Icon(
                     imageVector = if (fiszka.isFavourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = "Dodaj lub usuń z ulubionych"
@@ -195,14 +237,14 @@ fun FiszkaItem(
 
 fun exportToPdf(
     context: Context,
-    fiszki: List<Fiszka>,
+    fiszki: List<FiszkaUiState>,
     viewModelScope: CoroutineScope,
     zestawName: String
 ) {
     viewModelScope.launch(Dispatchers.IO) {
         withContext(Dispatchers.Main) {
             try {
-                val file = File(context.filesDir, "fiszki.pdf")
+                val file = File(context.filesDir, "fiszki_${zestawName}.pdf")
 
                 // Inicjalizacja dokumentu PDF
                 val pdfWriter = PdfWriter(file)

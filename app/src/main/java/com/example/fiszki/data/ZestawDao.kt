@@ -19,4 +19,8 @@ interface ZestawDao {
 
     @Query("SELECT * from zestaw ORDER BY zestaw_id ASC")
     fun getAllZestawy(): Flow<List<Zestaw>>
+
+    @MapInfo(keyColumn = "zestaw_id", valueColumn = "cnt")
+    @Query("SELECT zestaw_id, COUNT(fiszka_id) AS cnt from fiszka GROUP BY zestaw_id")
+    fun getZestawyCounts(): Flow<Map<Int, Int>>
 }

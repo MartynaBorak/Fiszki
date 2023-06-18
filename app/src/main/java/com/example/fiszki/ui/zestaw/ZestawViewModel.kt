@@ -23,6 +23,7 @@ class ZestawViewModel(
     private val zestawId: Int = checkNotNull(savedStateHandle[ZestawScreenDestination.zestawIdArg])
     var zestawUiState by mutableStateOf(ZestawUiState())
         private set
+    var filterFav by mutableStateOf(false)
     init {
         viewModelScope.launch {
             zestawUiState = zestawyRepository.getZestawStream(zestawId)
@@ -37,12 +38,26 @@ class ZestawViewModel(
     }
 
     val fiszkiUiState: StateFlow<FiszkiUiState> = fiszkiRepository.getAllInZestawStream(zestawId)
-        .map { FiszkiUiState(it) }
+        .map { FiszkiUiState(it.map { fiszka -> fiszka.toFiszkaUiState()  }) }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = FiszkiUiState()
         )
+
+    val favFiszkiUiState: StateFlow<FiszkiUiState> = fiszkiRepository.getAllFavInZestawStream(zestawId)
+        .map { FiszkiUiState(it.map { fiszka -> fiszka.toFiszkaUiState() }) }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
+            initialValue = FiszkiUiState()
+        )
+
+    suspend fun updateFiszka(fiszka: FiszkaUiState) {
+        if(fiszka.isValid()){
+            fiszkiRepository.updateFiszka(fiszka.toFiszka())
+        }
+    }
 }
 
-data class FiszkiUiState(val fiszkiList: List<Fiszka> = listOf())
+data class FiszkiUiState(val fiszkiList: List<FiszkaUiState> = listOf())

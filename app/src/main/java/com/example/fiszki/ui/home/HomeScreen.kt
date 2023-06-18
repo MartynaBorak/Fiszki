@@ -40,6 +40,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier
 ){
     val zestawyUiState by viewModel.zestawyUiState.collectAsState()
+    val zestawyCounts by viewModel.zestawyCounts.collectAsState()
     Scaffold(
         topBar = {
             FiszkiAppBar(
@@ -80,9 +81,13 @@ fun HomeScreen(
             ) {
                 items(
                     items = zestawyUiState.zestawyList,
-                    key = { it.zestaw_id }
+                    key = { it.id }
                 ) {
-                    ZestawItem(zestaw = it, onZestawClick = { navigateToZestawScreen(it.zestaw_id) })
+                    ZestawItem(
+                        zestaw = it,
+                        onZestawClick = { navigateToZestawScreen(it.id) },
+                        count = zestawyCounts[it.id]?:0
+                    )
                 }
             }
         }
@@ -91,8 +96,9 @@ fun HomeScreen(
 
 @Composable
 fun ZestawItem(
-    zestaw: Zestaw,
-    onZestawClick: (Zestaw) -> Unit,
+    zestaw: ZestawUiState,
+    onZestawClick: (ZestawUiState) -> Unit,
+    count: Int = 0,
     modifier: Modifier = Modifier
 ){
     Card(
@@ -114,16 +120,11 @@ fun ZestawItem(
                 fontSize = 18.sp
             )
             Text(
-                text = fiszkiCount(zestaw).toString(),
+                text = count.toString(),
                 fontSize = 18.sp
             )
         }
     }
-}
-
-fun fiszkiCount(zestaw: Zestaw): Int {
-    //TODO: napisać zapytanie o liczbę fiszek w zestawie
-    return 0
 }
 
 @Preview

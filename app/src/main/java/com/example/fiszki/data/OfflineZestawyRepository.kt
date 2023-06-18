@@ -12,4 +12,6 @@ class OfflineZestawyRepository(private val zestawDao: ZestawDao) : ZestawyReposi
     override fun getZestawStream(id: Int): Flow<Zestaw?> = zestawDao.getZestaw(id)
 
     override fun getAllZestawyStream(): Flow<List<Zestaw>> = zestawDao.getAllZestawy()
+
+    override fun getZestawyCountsStream(): Flow<Map<Int, Int>> = zestawDao.getZestawyCounts()
 }

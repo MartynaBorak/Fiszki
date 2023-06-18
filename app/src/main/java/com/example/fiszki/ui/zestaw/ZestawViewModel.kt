@@ -52,6 +52,12 @@ class ZestawViewModel(
             started = SharingStarted.WhileSubscribed(TIMEOUT_MILLIS),
             initialValue = FiszkiUiState()
         )
+
+    suspend fun updateFiszka(fiszka: FiszkaUiState) {
+        if(fiszka.isValid()){
+            fiszkiRepository.updateFiszka(fiszka.toFiszka())
+        }
+    }
 }
 
 data class FiszkiUiState(val fiszkiList: List<FiszkaUiState> = listOf())

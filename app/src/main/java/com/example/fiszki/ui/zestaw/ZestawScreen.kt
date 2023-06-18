@@ -131,7 +131,15 @@ fun ZestawScreen(
                             items = favFiszkiUiState.fiszkiList,
                             key = { it.id }
                         ) {
-                            FiszkaItem(fiszka = it, onFiszkaClick = { navigateToFiszkaDetails(it.id) })
+                            FiszkaItem(
+                                fiszka = it,
+                                onFiszkaClick = { navigateToFiszkaDetails(it.id) },
+                                onFavChanged = {
+                                    coroutineScope.launch {
+                                        viewModel.updateFiszka(it.copy(isFavourite = !it.isFavourite))
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -157,7 +165,15 @@ fun ZestawScreen(
                             items = fiszkiUiState.fiszkiList,
                             key = { it.id }
                         ) {
-                            FiszkaItem(fiszka = it, onFiszkaClick = { navigateToFiszkaDetails(it.id) })
+                            FiszkaItem(
+                                fiszka = it,
+                                onFiszkaClick = { navigateToFiszkaDetails(it.id) },
+                                onFavChanged = {
+                                    coroutineScope.launch {
+                                        viewModel.updateFiszka(it.copy(isFavourite = !it.isFavourite))
+                                    }
+                                }
+                            )
                         }
                     }
                 }
@@ -170,6 +186,7 @@ fun ZestawScreen(
 fun FiszkaItem(
     fiszka: FiszkaUiState,
     onFiszkaClick: (FiszkaUiState) -> Unit,
+    onFavChanged: (FiszkaUiState) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -190,7 +207,7 @@ fun FiszkaItem(
                 text = fiszka.front,
                 fontSize = 18.sp
             )
-            IconButton(onClick = { /* TODO: update isFavourite fiszki */ }) {
+            IconButton(onClick = { onFavChanged(fiszka) }) {
                 Icon(
                     imageVector = if(fiszka.isFavourite) Icons.Filled.Favorite else Icons.Filled.FavoriteBorder,
                     contentDescription = "Dodaj lub usuń z ulubionych"

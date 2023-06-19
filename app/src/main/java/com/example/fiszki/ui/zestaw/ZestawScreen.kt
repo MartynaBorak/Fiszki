@@ -2,6 +2,7 @@ package com.example.fiszki.ui.zestaw
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import android.widget.Toast
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -12,10 +13,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -60,6 +59,7 @@ fun ZestawScreen(
     val fiszkiUiState by viewModel.fiszkiUiState.collectAsState()
     val favFiszkiUiState by viewModel.favFiszkiUiState.collectAsState()
     val coroutineScope = rememberCoroutineScope()
+    var showLearnDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -67,7 +67,9 @@ fun ZestawScreen(
                 title = zestawUiState.name,
                 canNavigateBack = true,
                 actiontype = "menu",
-                onActionClicked = { navigateToZestawEdit(zestawUiState.id) },
+                onActionClicked = {
+                    Log.d("app bar", "${zestawUiState.id}")
+                    navigateToZestawEdit(zestawUiState.id) },
                 navigateUp = navigateBack
             )
         },
@@ -104,7 +106,7 @@ fun ZestawScreen(
                     )
                 }
                 Button(
-                    onClick = { navigateToLearn(zestawUiState.id, filtered) }, //TODO: tu bedzie pytanie czy filtrowane czy nie
+                    onClick = { showLearnDialog = true }, //TODO: tu bedzie pytanie czy filtrowane czy nie
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true
                 ) {
@@ -195,6 +197,20 @@ fun ZestawScreen(
                     }
                 }
             }
+            //
+            if(showLearnDialog) {
+                LearnDialog(
+                    onDismiss = { showLearnDialog = false },
+                    onAllClicked = {
+                        showLearnDialog = false
+                        navigateToLearn(zestawUiState.id, false)
+                    },
+                    onFilteredClicked = {
+                        showLearnDialog = false
+                        navigateToLearn(zestawUiState.id, true)
+                    }
+                )
+            }
         }
     }
 }
@@ -233,8 +249,6 @@ fun FiszkaItem(
         }
     }
 }
-
-
 
 fun exportToPdf(
     context: Context,
@@ -284,10 +298,6 @@ fun exportToPdf(
     }
 }
 
-
-
-
-
 fun sharePdfFile(context: Context) {
     val file = File(context.filesDir, "fiszki.pdf")
     val uri = FileProvider.getUriForFile(context, "com.example.fiszki.fileprovider", file)
@@ -300,6 +310,31 @@ fun sharePdfFile(context: Context) {
     val chooserIntent = Intent.createChooser(intent, "Udostępnij plik PDF")
     chooserIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     context.startActivity(chooserIntent)
+}
+
+@Composable
+private fun LearnDialog(
+    onDismiss: () -> Unit,
+    onAllClicked: () -> Unit,
+    onFilteredClicked: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("UCZ SIĘ") },
+        text = { Text("Czy chcesz przejrzeć wszystkie fiszki?") },
+        modifier = modifier.padding(16.dp),
+        dismissButton = {
+            TextButton(onClick = onAllClicked) {
+                Text("Wszystkie")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onFilteredClicked) {
+                Text("Tylko ulubione")
+            }
+        }
+    )
 }
 
 

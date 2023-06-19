@@ -70,7 +70,7 @@ fun FiszkaEditScreen(
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Pierwsza strona fiszki") }
+                label = { Text("Pierwsza strona fiszki", style = Typo.body2) }
             )
 
             Spacer(modifier = Modifier.size(10.dp))
@@ -81,7 +81,7 @@ fun FiszkaEditScreen(
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Druga strona fiszki") }
+                label = { Text("Druga strona fiszki", style = Typo.body2) }
             )
 
             Spacer(modifier = Modifier.size(30.dp))
@@ -97,7 +97,7 @@ fun FiszkaEditScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("ZAPISZ", color = Color.White, fontSize = 20.sp)
+                Text("ZAPISZ", color = Color.White, fontSize = 20.sp, style = Typography.body1)
             }
 
             OutlinedButton(
@@ -105,7 +105,7 @@ fun FiszkaEditScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
+                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp, style = Typography.body1)
             }
         }
     }

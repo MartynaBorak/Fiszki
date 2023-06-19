@@ -68,7 +68,7 @@ fun ZestawEditScreen(
                 OutlinedTextField(
                     value = zestawUiState.name,
                     onValueChange = { viewModel.updateUiState(zestawUiState.copy(name=it)) },
-                    label = { Text("Nazwa zestawu") },
+                    label = { Text("Nazwa zestawu", style = Typo.body2) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -84,7 +84,7 @@ fun ZestawEditScreen(
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("ZAPISZ ZMIANY", color = Color.White, fontSize = 20.sp)
+                    Text("ZAPISZ ZMIANY", color = Color.White, fontSize = 20.sp, style = Typography.body1)
                 }
 
                 OutlinedButton(
@@ -92,7 +92,7 @@ fun ZestawEditScreen(
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
+                    Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp, style = Typography.body1)
                 }
             }
 
@@ -124,7 +124,7 @@ fun ZestawEditScreen(
                     enabled = true,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("USUŃ ZESTAW", color = Color(0xFFFF6347), fontSize = 20.sp)
+                    Text("USUŃ ZESTAW", color = Color(0xFFFF6347), fontSize = 20.sp, style = Typography.body1)
                 }
 
                 if(deleteConfirmationRequired) {

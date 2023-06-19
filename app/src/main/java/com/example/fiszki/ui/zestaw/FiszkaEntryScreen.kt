@@ -42,7 +42,7 @@ fun FiszkaEntryScreen(
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            Text("STWÓRZ FISZKĘ", fontSize = 30.sp)
+            Text("STWÓRZ FISZKĘ", fontSize = 30.sp, style = Typography.body1)
 
             Spacer(modifier = Modifier.size(30.dp))
 
@@ -52,7 +52,7 @@ fun FiszkaEntryScreen(
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Pierwsza strona fiszki") }
+                label = { Text("Pierwsza strona fiszki", style = Typo.body2) }
             )
 
             Spacer(modifier = Modifier.size(10.dp))
@@ -63,7 +63,7 @@ fun FiszkaEntryScreen(
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Druga strona fiszki") }
+                label = { Text("Druga strona fiszki", style = Typo.body2) }
             )
 
             Spacer(modifier = Modifier.size(30.dp))
@@ -78,14 +78,14 @@ fun FiszkaEntryScreen(
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57)),
                 enabled = true
             ) {
-                Text("ZAPISZ", color = Color.White, fontSize = 20.sp)
+                Text("ZAPISZ", color = Color.White, fontSize = 20.sp, style = Typography.body1)
             }
 
             OutlinedButton(
                 onClick = navigateBack,
                 enabled = true
             ) {
-                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
+                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp, style = Typography.body1)
             }
         }
 

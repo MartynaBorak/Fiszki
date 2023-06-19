@@ -19,7 +19,7 @@ class ZestawEditViewModel(
     savedStateHandle: SavedStateHandle,
     private val zestawyRepository: ZestawyRepository
 ) : ViewModel() {
-    private val zestawId: Int = checkNotNull(savedStateHandle[ZestawScreenDestination.zestawIdArg])
+    private val zestawId: Int = checkNotNull(savedStateHandle[ZestawEditDestination.zestawIdArg])
     var zestawUiState by mutableStateOf(ZestawUiState())
         private set
 

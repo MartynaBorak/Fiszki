@@ -28,7 +28,7 @@ object LearnScreenDestination: NavDestination {
 
 @Composable
 fun LearnScreen(
-    navigateToSummary: () -> Unit = {},
+    navigateToSummary: () -> Unit = {}, //TODO: argumenty?
     navigateBack: ()->Unit,
     viewModel: LearnViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
@@ -53,27 +53,34 @@ fun LearnScreen(
                 .padding(paddingValues)
         ) {
             Row(
-                horizontalArrangement = Arrangement.Start,
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
             ) {
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = "Obejrzane: ${viewModel.seen}/${fiszki.fiszkiList.size}",
-                    fontSize = 24.sp
+                    text = "${viewModel.seen+1}/${fiszki.fiszkiList.size}",
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.End
                 )
                 Spacer(modifier = Modifier.size(8.dp))
+                Text(
+                    text = "${getScore(viewModel.correct, fiszki.fiszkiList.size)}%",
+                    fontSize = 24.sp,
+                    textAlign = TextAlign.End
+                )
             }
             Divider()
             Spacer(modifier = Modifier.size(8.dp))
-            LearnCard(
-                if(fiszki.fiszkiList.isEmpty())
-                    FiszkaUiState()
-                else if(fiszki.fiszkiList.size <= viewModel.seen)
-                    FiszkaUiState()
-                else
-                    fiszki.fiszkiList[viewModel.seen]
-            )
+            if(fiszki.fiszkiList.size > viewModel.seen){
+                LearnCard(
+                    if(fiszki.fiszkiList.isEmpty())
+                        FiszkaUiState()
+                    else
+                        fiszki.fiszkiList[viewModel.seen]
+                )
+            }
+            else navigateToSummary()
             Spacer(modifier = Modifier.size(8.dp))
 
             Row(
@@ -90,7 +97,10 @@ fun LearnScreen(
                 }
                 Spacer(modifier = Modifier.size(16.dp))
                 Button(
-                    onClick = { viewModel.seen++ }, //TODO: dodac liczenie wyniku
+                    onClick = {
+                        viewModel.seen++
+                        viewModel.correct++
+                    },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true
                 ) {
@@ -130,4 +140,8 @@ fun LearnCard(
             )
         }
     }
+}
+
+fun getScore(correct:Int, all:Int): Int {
+    return if(all>0) correct*100/all else 0
 }

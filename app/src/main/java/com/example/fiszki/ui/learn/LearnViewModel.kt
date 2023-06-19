@@ -58,4 +58,5 @@ class LearnViewModel(
         }
 
     var seen by mutableStateOf(0)
+    var correct by mutableStateOf(0)
 }

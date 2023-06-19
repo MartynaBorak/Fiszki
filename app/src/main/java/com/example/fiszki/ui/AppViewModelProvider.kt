@@ -75,9 +75,6 @@ object AppViewModelProvider {
                 FiszkiApplication().container.fiszkiRepository
             )
         }
-
-        // Initializers for each VM
-        // TODO: VMs not all implemented yet
     }
 }
 

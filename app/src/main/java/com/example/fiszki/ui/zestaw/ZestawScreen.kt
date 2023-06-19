@@ -106,7 +106,7 @@ fun ZestawScreen(
                     )
                 }
                 Button(
-                    onClick = { showLearnDialog = true }, //TODO: tu bedzie pytanie czy filtrowane czy nie
+                    onClick = { showLearnDialog = true },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true
                 ) {

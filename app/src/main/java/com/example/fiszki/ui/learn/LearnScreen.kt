@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -18,6 +19,8 @@ import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
 import com.example.fiszki.ui.zestaw.FiszkaUiState
+import com.example.fiszki.ui.zestaw.FiszkiUiState
+import java.util.Collections.shuffle
 
 object LearnScreenDestination: NavDestination {
     override val route = "learn"
@@ -28,13 +31,14 @@ object LearnScreenDestination: NavDestination {
 
 @Composable
 fun LearnScreen(
-    navigateToSummary: () -> Unit = {}, //TODO: argumenty?
     navigateBack: ()->Unit,
     viewModel: LearnViewModel = viewModel(factory = AppViewModelProvider.Factory),
     modifier: Modifier = Modifier
 ){
     val zestawUiState = viewModel.zestawUiState
     val fiszki by viewModel.fiszkiUiState.collectAsState()
+    var showSummaryDialog by rememberSaveable { mutableStateOf(false) }
+    fiszkiShuffle(fiszki)
 
     Scaffold(
         topBar = {
@@ -58,11 +62,13 @@ fun LearnScreen(
                 modifier = Modifier
             ) {
                 Spacer(modifier = Modifier.size(8.dp))
-                Text(
-                    text = "${viewModel.seen+1}/${fiszki.fiszkiList.size}",
-                    fontSize = 24.sp,
-                    textAlign = TextAlign.End
-                )
+                if(fiszki.fiszkiList.size > viewModel.seen) {
+                    Text(
+                        text = "${viewModel.seen + 1}/${fiszki.fiszkiList.size}",
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.End
+                    )
+                }
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
                     text = "${getScore(viewModel.correct, fiszki.fiszkiList.size)}%",
@@ -72,7 +78,7 @@ fun LearnScreen(
             }
             Divider()
             Spacer(modifier = Modifier.size(8.dp))
-            if(fiszki.fiszkiList.size > viewModel.seen){
+            if(fiszki.fiszkiList.isEmpty() || fiszki.fiszkiList.size > viewModel.seen){
                 LearnCard(
                     if(fiszki.fiszkiList.isEmpty())
                         FiszkaUiState()
@@ -80,7 +86,7 @@ fun LearnScreen(
                         fiszki.fiszkiList[viewModel.seen]
                 )
             }
-            else navigateToSummary()
+            else showSummaryDialog = true
             Spacer(modifier = Modifier.size(8.dp))
 
             Row(
@@ -108,6 +114,16 @@ fun LearnScreen(
                 }
             }
 
+            if(showSummaryDialog) {
+                SummaryDialog(
+                    onRepeatClicked = {
+                        showSummaryDialog = false
+                        restart(viewModel, fiszki)
+                    },
+                    navigateBack = navigateBack,
+                    score = getScore(viewModel.correct, fiszki.fiszkiList.size)
+                )
+            }
         }
 
     }
@@ -122,7 +138,7 @@ fun LearnCard(
     Column(modifier = Modifier
         .padding(30.dp)
         .fillMaxWidth()
-        .clickable(onClick = { side.value = !side.value } )
+        .clickable(onClick = { side.value = !side.value })
         .clip(shape = RoundedCornerShape(16.dp)),
     ) {
         Box(
@@ -144,4 +160,42 @@ fun LearnCard(
 
 fun getScore(correct:Int, all:Int): Int {
     return if(all>0) correct*100/all else 0
+}
+
+@Composable
+private fun SummaryDialog(
+    onRepeatClicked: () -> Unit,
+    navigateBack: () -> Unit,
+    score: Int,
+    modifier: Modifier = Modifier
+) {
+    AlertDialog(
+        onDismissRequest = { navigateBack() },
+        title = { Text("PODSUMOWANIE") },
+        text = { Text("Twój wynik to ${score}%\nGRATULACJE!") },
+        modifier = modifier.padding(16.dp),
+        dismissButton = {
+            TextButton(onClick = navigateBack) {
+                Text("Wróć")
+            }
+        },
+        confirmButton = {
+            TextButton(onClick = onRepeatClicked) {
+                Text("Jeszcze raz")
+            }
+        }
+    )
+}
+
+fun restart(
+    viewModel: LearnViewModel,
+    fiszki: FiszkiUiState
+) {
+    viewModel.seen = 0
+    viewModel.correct = 0
+    fiszkiShuffle(fiszki)
+}
+
+fun fiszkiShuffle( fiszki: FiszkiUiState ) {
+    shuffle(fiszki.fiszkiList)
 }

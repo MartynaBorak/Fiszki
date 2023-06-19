@@ -122,7 +122,6 @@ fun FiszkiNavHost(
             )
         ){
             LearnScreen(
-                navigateToSummary = { /*TODO*/ },
                 navigateBack = { navController.navigateUp() }
             )
         }

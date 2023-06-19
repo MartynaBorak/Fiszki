@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.preference.PreferenceManager
 import com.example.fiszki.notifications.AlarmItem
@@ -27,10 +28,19 @@ import com.example.fiszki.notifications.AndroidAlarmScheduler
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
 import com.example.fiszki.ui.theme.FiszkiTheme
+import com.example.fiszki.ui.theme.montserratRegular
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.format.DateTimeParseException
 import java.util.*
+
+val Typography1 = Typography(
+    body1 = TextStyle(
+        fontFamily = montserratRegular,
+        fontSize = 16.sp
+    )
+)
+
 
 object SettingsDestination: NavDestination {
     override val route = "settings"
@@ -85,17 +95,17 @@ fun SettingsScreen(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.size(104.dp))
-            Text("PRZYPOMNIENIA", fontSize = 28.sp)
+            Text("PRZYPOMNIENIA", fontSize = 28.sp, style = Typography1.body1)
             Spacer(modifier = Modifier.size(48.dp))
             // Po naciśnięciu guzika wyświetla się TimePicker
             Button(
                 onClick = { mTimePickerDialog.show() },
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0XFF8FBC8F))
             ) {
-                Text(text = "GODZINA PRZYPOMNIEŃ", color = Color.Black, fontSize = 20.sp)
+                Text(text = "GODZINA PRZYPOMNIEŃ", style= Typo.body2,color = Color.Black, fontSize = 20.sp)
             }
             // Wyświetlanie czasu wybranego przez użytkownika
-            Text(text = "Wybrany czas: ${mTime.value}", fontSize = 20.sp)
+            Text(text = "Wybrany czas: ${mTime.value}", fontSize = 20.sp, style = Typo.body2)
             Spacer(modifier = Modifier.size(48.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -136,7 +146,7 @@ fun SettingsScreen(
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57))
                 ) {
-                    Text(text = "ZAPISZ", color = Color.White, fontSize = 20.sp)
+                    Text(text = "ZAPISZ", color = Color.White, fontSize = 20.sp,style=Typography.body1)
                 }
                 Spacer(modifier = Modifier.size(16.dp))
                 Button(
@@ -148,7 +158,7 @@ fun SettingsScreen(
                     },
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFF6347))
                 ) {
-                    Text(text = "ANULUJ", color = Color.White, fontSize = 20.sp)
+                    Text(text = "ANULUJ", color = Color.White, fontSize = 20.sp, style= Typography.body1)
                 }
             }
         }

@@ -19,16 +19,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.FileProvider
+import androidx.core.content.res.ResourcesCompat
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.fiszki.R
 import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
+import com.example.fiszki.ui.theme.montserratRegular
+import com.example.fiszki.ui.theme.ralewayRegular
+import com.itextpdf.io.font.PdfEncodings
+import com.itextpdf.kernel.font.PdfFont
+import com.itextpdf.kernel.font.PdfFontFactory
 import com.itextpdf.kernel.pdf.PdfDocument
 import com.itextpdf.kernel.pdf.PdfWriter
 import com.itextpdf.layout.Document
+import com.itextpdf.layout.Style
 import com.itextpdf.layout.element.Paragraph
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -36,7 +45,22 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
 
+import java.io.FileOutputStream
+// Wczytaj plik czcionki z folderu assets
+// Wczytaj czcionkę z katalogu res/font
 
+val Typography = Typography(
+    body1 = TextStyle(
+        fontFamily = montserratRegular,
+        fontSize = 16.sp
+    )
+)
+val Typo = Typography(
+    body2 = TextStyle(
+        fontFamily = ralewayRegular,
+        fontSize = 16.sp
+    )
+)
 object ZestawScreenDestination: NavDestination {
     override val route = "zestaw"
     const val zestawIdArg = "zestawId"
@@ -76,7 +100,8 @@ fun ZestawScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navigateToFiszkaEntry(zestawUiState.id) },
-                modifier = Modifier.navigationBarsPadding()
+                modifier = Modifier.navigationBarsPadding(),
+                backgroundColor = Color(0xFF2E8B57)
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -110,7 +135,7 @@ fun ZestawScreen(
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF6495ed)),
                     enabled = true
                 ) {
-                    Text("UCZ SIĘ", color = Color.White, fontSize = 20.sp)
+                    Text("UCZ SIĘ", color = Color.White, fontSize = 20.sp, style = Typography.body1)
                 }
                 Button(
                     onClick = {
@@ -123,7 +148,7 @@ fun ZestawScreen(
                     colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFFFFA07A)),
                     enabled = true
                 ) {
-                    Text("PDF", color = Color.White, fontSize = 20.sp)
+                    Text("PDF", color = Color.White, fontSize = 20.sp, style = Typography.body1)
                 }
             }
             Divider()
@@ -137,7 +162,7 @@ fun ZestawScreen(
                             .fillMaxSize()
                             .padding(paddingValues)
                     ) {
-                        Text("Brak fiszek do pokazania")
+                        Text("Brak fiszek do pokazania", style = Typography.body1, color = Color(0xff808080))
                     }
                 } else {
                     LazyColumn(
@@ -171,18 +196,18 @@ fun ZestawScreen(
                             .fillMaxSize()
                             .padding(paddingValues)
                     ) {
-                        Text("Brak fiszek do pokazania")
+                        Text("Brak fiszek do pokazania",style = Typography.body1, color = Color(0xff808080))
                     }
                 } else {
                     LazyColumn(
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(paddingValues)
+                            .padding(paddingValues),
                     ) {
                         items(
                             items = fiszkiUiState.fiszkiList,
-                            key = { it.id }
+                            key = { it.id },
                         ) {
                             FiszkaItem(
                                 fiszka = it,
@@ -238,7 +263,8 @@ fun FiszkaItem(
         ) {
             Text(
                 text = fiszka.front,
-                fontSize = 18.sp
+                fontSize = 18.sp,
+                style = Typo.body2
             )
             IconButton(onClick = { onFavChanged(fiszka) }) {
                 Icon(
@@ -266,15 +292,25 @@ fun exportToPdf(
                 val pdfDocument = PdfDocument(pdfWriter)
                 val document = Document(pdfDocument)
 
+                val fontBoldPath = "font/allerbold.ttf"
+                val fontBold = PdfFontFactory.createFont("res/$fontBoldPath", PdfEncodings.IDENTITY_H)
+
+                val styleBold = Style().setFont(fontBold)
+
                 // Dodawanie nazwy zestawu do dokumentu
                 val content1 = "Zestaw: $zestawName"
-                val zestawNameParagraph = Paragraph(content1)
+                val zestawNameParagraph = Paragraph(content1).addStyle(styleBold)
                 document.add(zestawNameParagraph)
+
+                val fontPath = "font/aller.ttf"
+                val font = PdfFontFactory.createFont("res/$fontPath", PdfEncodings.IDENTITY_H)
+
+                val style = Style().setFont(font)
 
                 // Dodawanie fiszek do dokumentu
                 for (fiszka in fiszki) {
                     val content = "${fiszka.front} - ${fiszka.back}"
-                    val paragraph = Paragraph(content)
+                    val paragraph = Paragraph(content).addStyle(style)
                     document.add(paragraph)
                 }
 

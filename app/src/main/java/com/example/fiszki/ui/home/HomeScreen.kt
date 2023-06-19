@@ -16,6 +16,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -26,7 +28,22 @@ import com.example.fiszki.ui.AppViewModelProvider
 import com.example.fiszki.ui.components.FiszkiAppBar
 import com.example.fiszki.ui.navigation.NavDestination
 import com.example.fiszki.ui.theme.FiszkiTheme
+import com.example.fiszki.ui.theme.montserratRegular
+import com.example.fiszki.ui.theme.ralewayRegular
 
+val Typography = Typography(
+    body1 = TextStyle(
+        fontFamily = montserratRegular,
+        fontSize = 16.sp
+    )
+)
+
+val Typo = Typography(
+    body2 = TextStyle(
+        fontFamily = ralewayRegular,
+        fontSize = 16.sp
+    )
+)
 object HomeDestination: NavDestination {
     override val route = "home"
 }
@@ -53,7 +70,8 @@ fun HomeScreen(
         floatingActionButton = {
             FloatingActionButton(
                 onClick = { navigateToZestawEntry() },
-                modifier = Modifier.navigationBarsPadding()
+                modifier = Modifier.navigationBarsPadding(),
+                backgroundColor = Color(0xFF2E8B57),
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -70,7 +88,7 @@ fun HomeScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                Text("Brak zestawów do pokazania")
+                Text("Brak zestawów do pokazania", style = Typography.body1, color = Color(0xff808080))
             }
         } else {
             LazyColumn(
@@ -117,10 +135,12 @@ fun ZestawItem(
         ) {
             Text(
                 text = zestaw.name,
+                style = Typo.body2,
                 fontSize = 18.sp
             )
             Text(
                 text = count.toString(),
+                style = Typo.body2,
                 fontSize = 18.sp
             )
         }

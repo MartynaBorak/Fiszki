@@ -4,5 +4,13 @@
     <style name="Theme.Fiszki" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/purple_700</item>
         <item name="android:fontFamily">@font/montserrat</item>
+
+        <!-- Styl dla ActionBar -->
+        <item name="android:actionBarStyle">@style/MyActionBarStyle</item>
+    </style>
+
+    <!-- Styl dla ActionBar -->
+    <style name="MyActionBarStyle" parent="android:Widget.ActionBar">
+        <item name="android:fontFamily">@font/montserrat</item>
     </style>
 </resources>

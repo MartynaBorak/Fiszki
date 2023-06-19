@@ -69,7 +69,7 @@ fun FiszkaDetailsScreen(
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Pierwsza strona fiszki") }
+                label = { Text("Pierwsza strona fiszki", style = Typo.body2) }
             )
 
             Spacer(modifier = Modifier.size(10.dp))
@@ -81,7 +81,7 @@ fun FiszkaDetailsScreen(
                 singleLine = false,
                 maxLines = 4,
                 modifier = Modifier.fillMaxWidth(),
-                label = { Text("Druga strona fiszki") }
+                label = { Text("Druga strona fiszki", style = Typo.body2) }
             )
 
             Spacer(modifier = Modifier.size(30.dp))
@@ -92,7 +92,7 @@ fun FiszkaDetailsScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("EDYTUJ", color = Color.White, fontSize = 20.sp)
+                Text("EDYTUJ", color = Color.White, fontSize = 20.sp, style = Typography.body1)
             }
 
             var deleteConfirmationRequired by rememberSaveable { mutableStateOf(false) }
@@ -101,7 +101,7 @@ fun FiszkaDetailsScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("USUŃ", color = Color(0xFFFF6347), fontSize = 20.sp)
+                Text("USUŃ", color = Color(0xFFFF6347), fontSize = 20.sp, style = Typography.body1)
             }
 
             OutlinedButton(
@@ -109,7 +109,7 @@ fun FiszkaDetailsScreen(
                 enabled = true,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                Text("WRÓĆ", color = Color(0xFF6495ed), fontSize = 20.sp)
+                Text("WRÓĆ", color = Color(0xFF6495ed), fontSize = 20.sp, style = Typography.body1)
             }
 
             if(deleteConfirmationRequired) {

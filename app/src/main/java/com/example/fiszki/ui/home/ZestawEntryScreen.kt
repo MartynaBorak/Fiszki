@@ -43,14 +43,14 @@ fun ZestawEntryScreen(
                 .fillMaxSize()
                 .padding(8.dp)
         ) {
-            Text("STWÓRZ ZESTAW", fontSize = 30.sp)
+            Text("STWÓRZ ZESTAW", fontSize = 30.sp, style = Typography.body1)
 
             Spacer(modifier = Modifier.size(30.dp))
 
             OutlinedTextField(
                 value = zestawUiState.name,
                 onValueChange = { viewModel.updateUiState(zestawUiState.copy(name=it)) },
-                label = { Text("Nazwa zestawu") },
+                label = { Text("Nazwa zestawu", style = Typo.body2) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -67,14 +67,14 @@ fun ZestawEntryScreen(
                 colors = ButtonDefaults.buttonColors(backgroundColor = Color(0xFF2E8B57)),
                 enabled = true
             ) {
-                Text("ZAPISZ", color = Color.White, fontSize = 20.sp)
+                Text("ZAPISZ", color = Color.White, fontSize = 20.sp, style = Typography.body1)
             }
 
             OutlinedButton(
                 onClick = navigateBack,
                 enabled = true
             ) {
-                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp)
+                Text("ANULUJ", color = Color(0xFFFF6347), fontSize = 20.sp, style = Typography.body1)
             }
         }
     }

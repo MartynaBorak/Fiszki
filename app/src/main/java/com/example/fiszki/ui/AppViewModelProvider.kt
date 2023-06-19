@@ -8,6 +8,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.fiszki.FiszkiApplication
 import com.example.fiszki.ui.home.ZestawEntryViewModel
 import com.example.fiszki.ui.home.ZestawyViewModel
+import com.example.fiszki.ui.learn.LearnViewModel
 import com.example.fiszki.ui.zestaw.*
 
 object AppViewModelProvider {
@@ -66,8 +67,14 @@ object AppViewModelProvider {
             )
         }
 
-        // Initializers for each VM
-        // TODO: VMs not all implemented yet
+        // Initializer for LearnVM
+        initializer {
+            LearnViewModel(
+                this.createSavedStateHandle(),
+                FiszkiApplication().container.zestawyRepository,
+                FiszkiApplication().container.fiszkiRepository
+            )
+        }
     }
 }
 

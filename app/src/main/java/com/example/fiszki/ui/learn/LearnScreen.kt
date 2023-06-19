@@ -1,14 +1,10 @@
 package com.example.fiszki.ui.learn
 
-import android.util.Log
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,13 +53,13 @@ fun LearnScreen(
                 .padding(paddingValues)
         ) {
             Row(
-                horizontalArrangement = Arrangement.End,
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
             ) {
                 Spacer(modifier = Modifier.size(8.dp))
                 Text(
-                    text = "${viewModel.seen}/${fiszki.fiszkiList.size}",
+                    text = "Obejrzane: ${viewModel.seen}/${fiszki.fiszkiList.size}",
                     fontSize = 24.sp
                 )
                 Spacer(modifier = Modifier.size(8.dp))
@@ -76,7 +72,8 @@ fun LearnScreen(
                 else if(fiszki.fiszkiList.size <= viewModel.seen)
                     FiszkaUiState()
                 else
-                    fiszki.fiszkiList[viewModel.seen])
+                    fiszki.fiszkiList[viewModel.seen]
+            )
             Spacer(modifier = Modifier.size(8.dp))
 
             Row(
